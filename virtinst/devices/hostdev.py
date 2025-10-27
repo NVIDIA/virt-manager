@@ -130,6 +130,7 @@ class DeviceHostdev(Device):
     driver_iommufd = XMLProperty("./driver/@iommufd", is_yesno=True)
     rom_bar = XMLProperty("./rom/@bar", is_onoff=True)
     acpi_nodeset = XMLProperty("./acpi/@nodeset")
+    vpasidCapOffset = XMLProperty("./vpasidCapOffset")
 
     # type=scsi handling
     scsi_adapter = XMLProperty("./source/adapter/@name")
