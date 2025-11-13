@@ -1015,6 +1015,29 @@ c.add_compare(
     precompare_check="5.3.0",
 )
 
+# EGM
+c.add_compare(
+    "--pxe "
+    "--memory hotplugmemorymax=4096,hotplugmemoryslots=3 "
+    "--cpu cell0.cpus=0,cell0.memory=1048576 "
+    "--memdev dimm,access=private,target_size=256,target_node=0,"
+    "source_pagesize=4,source_nodemask=1-2,discard=on "
+    "--memdev dimm,access=private,target_size=256,target_node=0,"
+    "source.pagesize=4,source.nodemask=1-2,discard=on "
+    "--memdev nvdimm,source_path=/path/to/nvdimm,"
+    "target_size=512,target_node=0,target_label_size=128,alias.name=mymemdev3,"
+    "target.block=2048,target.requested=1048576,target.current=524288,"
+    "address.type=dimm,address.base=0x100000000,address.slot=1,"
+    "source.pmem=on,source.alignsize=2048,target.readonly=on "
+    "--memdev virtio-mem,target_node=0,target.block=524288,target.dynamicMemslots=yes,"
+    "target_size=512,target.requested=524288,target.address_base=0x180000000 "
+    "--memdev virtio-pmem,source.path=/tmp/virtio_pmem,"
+    "target_size=512,target.address_base=0x1a0000000 "
+    "--memdev egm,source.path=/dev/egm0,"
+    "target_size=512,target_node=0,target.pci_dev=ua-hostdev0 ",
+    "memory-hotplug-egm",
+    prerun_check="11.9.0",
+)
 
 # Hitting test driver specific output
 c.add_compare(
