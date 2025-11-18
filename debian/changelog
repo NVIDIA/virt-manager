@@ -1,0 +1,6 @@
+virt-manager (5.1.0+nvidia1-1) unstable; urgency=medium
+
+  * Initial Debian packaging for stable branch with 
+    support for Grace I/O virtualization features + CCA
+
+ -- Nathan Chen <nathanc@nvidia.com>  Tue, 20 Jan 2026 14:52:01 -0800
