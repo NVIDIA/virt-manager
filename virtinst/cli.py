@@ -5332,6 +5332,7 @@ class ParserLaunchSecurity(VirtCLIParser):
         cls.add_arg("measurementAlgo", "measurementAlgo")
         cls.add_arg("personalizationValue", "personalizationValue")
         cls.add_arg("measurementLog", "measurementLog", is_onoff=True)
+        cls.add_arg("sharedMec", "sharedMec", is_onoff=True)
 
 
 ###########################
