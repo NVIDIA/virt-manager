@@ -1,0 +1,209 @@
+Description: virtinstall: Fix --location and --cloud-init conflict
+ So far, --cloud-init is ignored when --location is specified.
+ .
+ Resolves: virt-manager#469
+Author: Patrice Lacouture <p.lacouture@see.fr>
+Origin: upstream, https://github.com/virt-manager/virt-manager/pull/485
+Bug: https://github.com/virt-manager/virt-manager/issues/469
+Bug-Ubuntu: https://launchpad.net/bugs/2073461
+Bug-Debian: https://bugs.debian.org/1076540
+Applied-Upstream: https://github.com/virt-manager/virt-manager/commit/72a74fb1
+Last-Update: 2024-07-23
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- /dev/null
++++ b/tests/data/cli/compare/virt-install-location-iso-and-cloud-init.xml
+@@ -0,0 +1,172 @@
++<domain type="kvm">
++  <name>fedora17</name>
++  <uuid>00000000-1111-2222-3333-444444444444</uuid>
++  <metadata>
++    <libosinfo:libosinfo xmlns:libosinfo="http://libosinfo.org/xmlns/libvirt/domain/1.0">
++      <libosinfo:os id="http://fedoraproject.org/fedora/17"/>
++    </libosinfo:libosinfo>
++  </metadata>
++  <memory>65536</memory>
++  <currentMemory>65536</currentMemory>
++  <vcpu>2</vcpu>
++  <os>
++    <type arch="x86_64" machine="pc-i440fx-6.1">hvm</type>
++    <kernel>/VIRTINST-TESTSUITE/vmlinuz</kernel>
++    <initrd>/VIRTINST-TESTSUITE/initrd.img</initrd>
++    <smbios mode="sysinfo"/>
++  </os>
++  <features>
++    <acpi/>
++    <apic/>
++    <vmport state="off"/>
++  </features>
++  <cpu mode="host-passthrough"/>
++  <clock offset="utc">
++    <timer name="rtc" tickpolicy="catchup"/>
++    <timer name="pit" tickpolicy="delay"/>
++    <timer name="hpet" present="no"/>
++  </clock>
++  <pm>
++    <suspend-to-mem enabled="no"/>
++    <suspend-to-disk enabled="no"/>
++  </pm>
++  <devices>
++    <emulator>/usr/bin/qemu-system-x86_64</emulator>
++    <disk type="file" device="disk">
++      <driver name="qemu" type="qcow2"/>
++      <source file="/pool-dir/testvol1.img"/>
++      <target dev="vda" bus="virtio"/>
++    </disk>
++    <disk type="file" device="cdrom">
++      <driver name="qemu"/>
++      <source file="TESTSUITE_SCRUBBED/tests/data/fakemedia/fake-fedora17-tree.iso"/>
++      <target dev="hda" bus="ide"/>
++      <readonly/>
++    </disk>
++    <controller type="usb" model="ich9-ehci1"/>
++    <controller type="usb" model="ich9-uhci1">
++      <master startport="0"/>
++    </controller>
++    <controller type="usb" model="ich9-uhci2">
++      <master startport="2"/>
++    </controller>
++    <controller type="usb" model="ich9-uhci3">
++      <master startport="4"/>
++    </controller>
++    <console type="pty"/>
++    <channel type="unix">
++      <source mode="bind"/>
++      <target type="virtio" name="org.qemu.guest_agent.0"/>
++    </channel>
++    <channel type="spicevmc">
++      <target type="virtio" name="com.redhat.spice.0"/>
++    </channel>
++    <input type="tablet" bus="usb"/>
++    <graphics type="spice" port="-1" tlsPort="-1" autoport="yes">
++      <image compression="off"/>
++    </graphics>
++    <sound model="ich6"/>
++    <video>
++      <model type="qxl"/>
++    </video>
++    <redirdev bus="usb" type="spicevmc"/>
++    <redirdev bus="usb" type="spicevmc"/>
++    <memballoon model="virtio"/>
++    <rng model="virtio">
++      <backend model="random">/dev/urandom</backend>
++    </rng>
++    <disk type="file" device="cdrom">
++      <driver name="qemu" type="raw"/>
++      <source file="/VIRTINST-TESTSUITE/cloudinit.iso"/>
++      <target dev="hdb" bus="ide"/>
++      <readonly/>
++    </disk>
++  </devices>
++  <sysinfo type="smbios">
++    <system>
++      <entry name="serial">ds=nocloud</entry>
++    </system>
++  </sysinfo>
++  <on_reboot>destroy</on_reboot>
++</domain>
++<domain type="kvm">
++  <name>fedora17</name>
++  <uuid>00000000-1111-2222-3333-444444444444</uuid>
++  <metadata>
++    <libosinfo:libosinfo xmlns:libosinfo="http://libosinfo.org/xmlns/libvirt/domain/1.0">
++      <libosinfo:os id="http://fedoraproject.org/fedora/17"/>
++    </libosinfo:libosinfo>
++  </metadata>
++  <memory>65536</memory>
++  <currentMemory>65536</currentMemory>
++  <vcpu>2</vcpu>
++  <os>
++    <type arch="x86_64" machine="pc-i440fx-6.1">hvm</type>
++    <boot dev="hd"/>
++  </os>
++  <features>
++    <acpi/>
++    <apic/>
++    <vmport state="off"/>
++  </features>
++  <cpu mode="host-passthrough"/>
++  <clock offset="utc">
++    <timer name="rtc" tickpolicy="catchup"/>
++    <timer name="pit" tickpolicy="delay"/>
++    <timer name="hpet" present="no"/>
++  </clock>
++  <pm>
++    <suspend-to-mem enabled="no"/>
++    <suspend-to-disk enabled="no"/>
++  </pm>
++  <devices>
++    <emulator>/usr/bin/qemu-system-x86_64</emulator>
++    <disk type="file" device="disk">
++      <driver name="qemu" type="qcow2"/>
++      <source file="/pool-dir/testvol1.img"/>
++      <target dev="vda" bus="virtio"/>
++    </disk>
++    <disk type="file" device="cdrom">
++      <driver name="qemu"/>
++      <source file="TESTSUITE_SCRUBBED/tests/data/fakemedia/fake-fedora17-tree.iso"/>
++      <target dev="hda" bus="ide"/>
++      <readonly/>
++    </disk>
++    <controller type="usb" model="ich9-ehci1"/>
++    <controller type="usb" model="ich9-uhci1">
++      <master startport="0"/>
++    </controller>
++    <controller type="usb" model="ich9-uhci2">
++      <master startport="2"/>
++    </controller>
++    <controller type="usb" model="ich9-uhci3">
++      <master startport="4"/>
++    </controller>
++    <console type="pty"/>
++    <channel type="unix">
++      <source mode="bind"/>
++      <target type="virtio" name="org.qemu.guest_agent.0"/>
++    </channel>
++    <channel type="spicevmc">
++      <target type="virtio" name="com.redhat.spice.0"/>
++    </channel>
++    <input type="tablet" bus="usb"/>
++    <graphics type="spice" port="-1" tlsPort="-1" autoport="yes">
++      <image compression="off"/>
++    </graphics>
++    <sound model="ich6"/>
++    <video>
++      <model type="qxl"/>
++    </video>
++    <redirdev bus="usb" type="spicevmc"/>
++    <redirdev bus="usb" type="spicevmc"/>
++    <memballoon model="virtio"/>
++    <rng model="virtio">
++      <backend model="random">/dev/urandom</backend>
++    </rng>
++    <disk type="file" device="cdrom">
++      <target dev="hdb" bus="ide"/>
++      <readonly/>
++    </disk>
++  </devices>
++</domain>
+--- a/tests/test_cli.py
++++ b/tests/test_cli.py
+@@ -1088,6 +1088,7 @@
+ c.add_compare("--osinfo linux2020 --pxe", "linux2020", prerun_check=no_osinfo_linux2020_virtio)
+ c.add_compare("--osinfo generic --disk none --location %(ISO-NO-OS)s,kernel=frib.img,initrd=/frob.img", "location-manual-kernel", prerun_check=missing_xorriso)  # --location with an unknown ISO but manually specified kernel paths
+ c.add_compare("--disk %(EXISTIMG1)s --location %(ISOTREE)s --nonetworks", "location-iso", prerun_check=missing_xorriso)  # Using --location iso mounting
++c.add_compare("--disk %(EXISTIMG1)s --location %(ISOTREE)s --nonetworks --cloud-init user-data=%(XMLDIR)s/cloudinit/user-data.txt,meta-data=%(XMLDIR)s/cloudinit/meta-data.txt", "location-iso-and-cloud-init", prerun_check=missing_xorriso)  # Using --location iso mounting and --cloud-init at the same time
+ c.add_compare("--disk %(EXISTIMG1)s --cdrom %(ISOLABEL)s", "cdrom-centos-label")  # Using --cdrom with centos CD label, should use virtio etc.
+ c.add_compare("--disk %(EXISTIMG1)s --install bootdev=network --os-variant rhel5.4 --cloud-init none", "kvm-rhel5")  # RHEL5 defaults
+ c.add_compare("--disk %(EXISTIMG1)s --install kernel=%(ISO-WIN7)s,initrd=%(ISOLABEL)s,kernel_args='foo bar' --os-variant rhel6.4 --unattended none", "kvm-rhel6")  # RHEL6 defaults. ISO paths are just to point at existing files
+--- a/virtinst/install/installer.py
++++ b/virtinst/install/installer.py
+@@ -393,7 +393,7 @@
+         elif unattended_scripts:
+             self._prepare_unattended_data(guest, meter, unattended_scripts)
+ 
+-        elif self._cloudinit_data:
++        if self._cloudinit_data:
+             self._prepare_cloudinit(guest, meter)
+ 
+     def _cleanup(self, guest):
