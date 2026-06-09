@@ -1,5 +1,0 @@
-upstream_tests-data-refresh-Fedora-tree-URLs-in-virt-install-.patch
-virtinstall-Fix-location-and-cloud-init-conflict.patch
-upstream_tests-cli-Adjust-hotplug-test-for-latest-libvirt.patch
-upstream_build-use-super.patch
-upstream_build-use-setuptools.command.build-when-available.patch
