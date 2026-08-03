@@ -15,9 +15,9 @@ Build-Depends:
  dh-python,
  dh-sequence-python3,
  gettext,
+ meson (>= 0.63.0),
  python3,
  python3-docutils,
- python3-setuptools,
 # for the tests
  cpio <!nocheck>,
  xorriso <!nocheck>,
