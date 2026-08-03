@@ -19,6 +19,8 @@ try:
 except ImportError:
     argcomplete = None
 
+import libvirt
+
 from gi.repository import Libosinfo
 
 from virtinst import log
@@ -108,6 +110,61 @@ def has_old_osinfo():
 def missing_xorriso():
     if not HAS_xorriso:
         return "xorriso not installed"
+
+
+def _probe_egm_memdev():
+    """
+    'egm' memory devices are only accepted by NVIDIA patched libvirt, and a
+    libvirt version number cannot distinguish that from a stock libvirt of the
+    same version, so ask the installed libvirt whether it parses one. Returns
+    a skip reason, or None if egm is accepted.
+    """
+    xml = """
+<domain type='test'>
+  <name>egm-probe</name>
+  <memory unit='KiB'>65536</memory>
+  <maxMemory slots='2' unit='KiB'>131072</maxMemory>
+  <vcpu>1</vcpu>
+  <os><type arch='x86_64'>hvm</type></os>
+  <cpu>
+    <numa><cell id='0' cpus='0' memory='65536' unit='KiB'/></numa>
+  </cpu>
+  <devices>
+    <controller type="pci" model="pcie-root"/>
+    <controller type="pci" model="pcie-root-port"/>
+    <memory model='egm'>
+      <source>
+        <path>/dev/egm0</path>
+      </source>
+      <target>
+        <size unit='KiB'>65536</size>
+        <node>0</node>
+        <pciDev>ua-hostdev0</pciDev>
+      </target>
+    </memory>
+  </devices>
+</domain>
+"""
+    try:
+        conn = libvirt.open("test:///default")
+    except libvirt.libvirtError as e:
+        return "could not open libvirt test driver to probe egm support: %s" % e
+
+    try:
+        try:
+            dom = conn.defineXML(xml)
+        except libvirt.libvirtError as e:
+            return "libvirt does not accept egm memory devices: %s" % e
+        dom.undefine()
+    finally:
+        conn.close()
+
+
+EGM_MEMDEV_SKIP = _probe_egm_memdev()
+
+
+def no_egm_memdev():
+    return EGM_MEMDEV_SKIP
 
 
 def no_osinfo_unattend_cb():
@@ -1036,7 +1093,7 @@ c.add_compare(
     "--memdev egm,source.path=/dev/egm0,"
     "target_size=512,target_node=0,target.pci_dev=ua-hostdev0 ",
     "memory-hotplug-egm",
-    prerun_check="11.9.0",
+    predefine_check=no_egm_memdev,
 )
 
 # Hitting test driver specific output
