@@ -46,7 +46,7 @@ Depends:
  python3-gi (>= 3.31.3~),
  python3-gi-cairo,
  python3-libvirt (>= 0.7.1),
- virtinst (= ${binary:Version}),
+ virt-install (= ${binary:Version}),
  ${misc:Depends},
  ${python3:Depends},
 Recommends:
@@ -69,7 +69,7 @@ Description: desktop application for managing virtual machines
  allocation & virtual hardware. An embedded VNC and SPICE client viewer
  presents a full graphical console to the guest domain.
 
-Package: virtinst
+Package: virt-install
 Architecture: all
 Depends:
  e2fsprogs,
@@ -87,10 +87,15 @@ Recommends:
  virt-viewer,
 Suggests:
  python3-argcomplete,
+Provides:
+ virt-clone,
+ virt-xml,
 Breaks:
  virt-manager (<< 1:3.2.0-3~),
+ virtinst (<< 1:5.1.0+nvidia-unstable3-1~),
 Replaces:
  virt-manager (<< 1:3.2.0-3~),
+ virtinst (<< 1:5.1.0+nvidia-unstable3-1~),
 Description: utilities to create and edit virtual machines
  This package contains some command line utilities to create and edit virtual
  machines:
@@ -101,3 +106,12 @@ Description: utilities to create and edit virtual machines
   - virt-install: provision operating systems into new virtual machines
   - virt-xml: easily edit libvirt domain XML using virt-install's command line
     options
+
+Package: virtinst
+Architecture: all
+Depends:
+ virt-install (>= ${source:Version}),
+ ${misc:Depends},
+Description: transitional dummy package for virt-install
+ This is a transitional dummy package to install virt-install; it can be
+ safely removed.
