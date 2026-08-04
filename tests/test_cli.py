@@ -167,6 +167,62 @@ def no_egm_memdev():
     return EGM_MEMDEV_SKIP
 
 
+def _probe_cca_launch_security(description, launch_security):
+    """
+    Like _probe_egm_memdev, but for 'cca' launchSecurity, which is only
+    accepted by NVIDIA patched libvirt. Arm CCA is still an unmerged RFC
+    upstream, so no stock libvirt parses it at any version. Takes the same
+    launchSecurity element the caller's test emits, since cca and its
+    individual attributes were not all added at once. Returns a skip reason,
+    or None if the element is accepted.
+    """
+    template = """
+<domain type='test'>
+  <name>cca-probe</name>
+  <memory unit='KiB'>65536</memory>
+  <vcpu>1</vcpu>
+  <os><type arch='aarch64' machine='virt'>hvm</type></os>
+  %s
+</domain>
+"""
+    xml = template % launch_security
+    try:
+        conn = libvirt.open("test:///default")
+    except libvirt.libvirtError as e:
+        return "could not open libvirt test driver to probe cca support: %s" % e
+
+    try:
+        try:
+            dom = conn.defineXML(xml)
+        except libvirt.libvirtError as e:
+            return "libvirt does not accept %s: %s" % (description, e)
+        dom.undefine()
+    finally:
+        conn.close()
+
+
+CCA_SKIP = _probe_cca_launch_security(
+    "cca launchSecurity",
+    """
+  <launchSecurity type="cca" measurement-log="yes">
+    <measurement-algo>sha256</measurement-algo>
+    <personalization-value>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</personalization-value>
+  </launchSecurity>
+""",
+)
+CCA_SHARED_MEC_SKIP = _probe_cca_launch_security(
+    "cca launchSecurity with shared-mec", '<launchSecurity type="cca" shared-mec="yes"/>'
+)
+
+
+def no_cca():
+    return CCA_SKIP
+
+
+def no_cca_shared_mec():
+    return CCA_SHARED_MEC_SKIP
+
+
 def no_osinfo_unattend_cb():
     if NO_OSINFO_UNATTEND:
         return "osinfo is too old for unattended testing"
@@ -2013,12 +2069,12 @@ c = vinst.add_category(
 c.add_compare(
     "--boot uefi --machine virt --launchSecurity type=cca,measurementAlgo=sha256,personalizationValue=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==,measurementLog=on",
     "aarch64-launch-security-cca",
-    prerun_check="11.9.0",
+    predefine_check=no_cca,
 )
 c.add_compare(
     "--boot uefi --machine virt --launchSecurity type=cca,sharedMec=on",
     "aarch64-launch-security-cca-shared-mec",
-    prerun_check="11.9.0",
+    predefine_check=no_cca_shared_mec,
 )
 
 
