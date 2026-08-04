@@ -1,3 +1,14 @@
+virt-manager (1:5.1.0+nvidia-stable2-1) noble; urgency=medium
+
+  * NVIDIA: [Packaging]: Ignore the deb/ build output directory in dpkg-source
+  * NVIDIA: [Packaging]: Declare the 3.0 (quilt) source format
+  * NVIDIA: [Packaging]: Skip the test suite when nocheck is requested
+  * NVIDIA: [Packaging]: rename virtinst binary package to virt-install
+  * NVIDIA: SAUCE: tests: Probe libvirt for EGM memdev support instead of version gating
+  * NVIDIA: [Packaging]: Build with meson instead of pybuild
+
+ -- Nathan Chen <nathanc@nvidia.com>  Tue, 04 Aug 2026 13:20:01 -0800
+
 virt-manager (1:5.1.0+nvidia-stable1-1) noble; urgency=medium
 
   * Initial Debian packaging for unstable branch with
