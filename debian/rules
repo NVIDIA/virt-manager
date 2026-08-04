@@ -13,7 +13,9 @@ override_dh_python3:
 	dh_python3 usr/share/virt-manager
 
 override_dh_auto_test:
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS) $(DEB_BUILD_PROFILES)))
 	pytest-3 -v -rs
+endif
 
 override_dh_installdocs:
 	dh_installdocs --all NEWS.md
