@@ -1,3 +1,15 @@
+virt-manager (1:5.1.0+nvidia-unstable3-1) noble; urgency=medium
+
+  * NVIDIA: [Packaging]: Build with meson instead of pybuild
+  * NVIDIA: SAUCE: tests: Probe libvirt for EGM memdev support instead of version gating
+  * NVIDIA: [Packaging]: rename virtinst binary package to virt-install
+  * NVIDIA: [Packaging]: Skip the test suite when nocheck is requested
+  * NVIDIA: [Packaging]: Declare the 3.0 (quilt) source format
+  * NVIDIA: [Packaging]: Ignore the deb/ build output directory in dpkg-source
+  * NVIDIA: SAUCE: tests: Probe libvirt for CCA launchSecurity support instead of version gating
+
+ -- Nathan Chen <nathanc@nvidia.com>  Mon, 24 Aug 2026 12:30:25 -0800
+
 virt-manager (1:5.1.0+nvidia-unstable2-1) noble; urgency=medium
 
   * Fix CCA launchSecurity property name mappings
